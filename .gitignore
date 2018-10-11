@@ -20,3 +20,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .console_history
+
+node_modules
+bitbox-javascript-sdk
+*.DS_Store

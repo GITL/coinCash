@@ -2,30 +2,34 @@ import React, { Component } from "react";
 import logo from "./logo.png";
 
 import "./App.css";
+// import {createWallet} from './create-wallet';
 let BITBOXSDK = require("bitbox-sdk/lib/bitbox-sdk").default;
-let BITBOX = new BITBOXSDK();
+let BITBOX = new BITBOXSDK({
+  restURL: 'https://trest.bitcoin.com/v1/'
+});
 
-let langs = [
-  "english",
-  "chinese_simplified",
-  "chinese_traditional",
-  "korean",
-  "japanese",
-  "french",
-  "italian",
-  "spanish"
-];
+// let langs = [
+//   "english",
+//   "chinese_simplified",
+//   "chinese_traditional",
+//   "korean",
+//   "japanese",
+//   "french",
+//   "italian",
+//   "spanish"
+// ];
 
-let lang = langs[Math.floor(Math.random() * langs.length)];
+// let lang = langs[Math.floor(Math.random() * langs.length)];
 
 // create 256 bit BIP39 mnemonic
-let mnemonic = BITBOX.Mnemonic.generate(256, BITBOX.Mnemonic.wordLists()[lang]);
+// let mnemonic = ''let mnemonic = BITBOX.Mnemonic.generate(256, BITBOX.Mnemonic.wordLists()[lang]);
+let mnemonic = 'sister often rapid purity solution twice fame trade pumpkin clean coyote olive lonely cabin stick slush wealth rail decade pride goose source kid check';
 
 // root seed buffer
 let rootSeed = BITBOX.Mnemonic.toSeed(mnemonic);
 
 // master HDNode
-let masterHDNode = BITBOX.HDNode.fromSeed(rootSeed, "bitcoincash");
+let masterHDNode = BITBOX.HDNode.fromSeed(rootSeed, "testnet");
 
 // HDNode of BIP44 account
 let account = BITBOX.HDNode.derivePath(masterHDNode, "m/44'/145'/0'");
@@ -41,21 +45,28 @@ class App extends Component {
     super(props);
     this.state = {
       mnemonic: mnemonic,
-      lang: lang,
       hex: "",
       txid: ""
     };
   }
 
-  componentDidMount() {
+  // handleClick() {
+  //   // createWallet();
+  //   alert("I was clicked");
+
+  // }
+
+  handleClick() {
+    console.log(cashAddress);
     BITBOX.Address.utxo(cashAddress).then(
       result => {
+        console.log(result);
+
         if (!result[0]) {
           return;
         }
-
         // instance of transaction builder
-        let transactionBuilder = new BITBOX.TransactionBuilder("bitcoincash");
+        let transactionBuilder = new BITBOX.TransactionBuilder("testnet");
         // original amount of satoshis in vin
         let originalAmount = result[0].satoshis;
 
@@ -97,16 +108,18 @@ class App extends Component {
         let tx = transactionBuilder.build();
         // output rawhex
         let hex = tx.toHex();
-        this.setState({
-          hex: hex
-        });
+        // this.setState({
+        //   hex: hex
+        // });
+        console.log(hex);
 
         // sendRawTransaction to running BCH node
         BITBOX.RawTransactions.sendRawTransaction(hex).then(
           result => {
-            this.setState({
-              txid: result
-            });
+            // this.setState({
+            //   txid: result
+            // });
+            console.log(result);
           },
           err => {
             console.log(err);
@@ -134,11 +147,12 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Hello BITBOX</h1>
+          <h1 className="App-title">Nearby Cash</h1>
         </header>
         <div className="App-content">
+          <button onClick={this.handleClick} >SEND</button>
           <h2>BIP44 $BCH Wallet</h2>
-          <h3>256 bit {lang} BIP39 Mnemonic:</h3> <p>{this.state.mnemonic}</p>
+          <h3>256 bit english BIP39 Mnemonic:</h3> <p>{this.state.mnemonic}</p>
           <h3>BIP44 Account</h3>
           <p>
             <code>"m/44'/145'/0'"</code>
