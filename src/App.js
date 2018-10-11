@@ -30,7 +30,7 @@ let cashAddress = BITBOX.HDNode.toCashAddress(change);
 
 const style = {
   width: '90%',
-  height: '90%'
+  height: '80%'
 }
 
 class App extends Component {
@@ -43,11 +43,11 @@ class App extends Component {
     };
   }
 
-  // handleClick() {
-  //   // createWallet();
-  //   alert("I was clicked");
-
-  // }
+  state = {
+    showingInfoWindow: false,
+    activeMarker: {},
+    selectedPlace: {},
+  };
 
   handleClick() {
     console.log(cashAddress);
@@ -133,7 +133,22 @@ class App extends Component {
     alert('A transaction happened: ' + this.state.value);
     event.preventDefault();
   }
+  
+  onMarkerClick = (props, marker, e) =>
+    this.setState({
+      selectedPlace: props,
+      activeMarker: marker,
+      showingInfoWindow: true
+    });
 
+    onMapClicked = (props) => {
+      if (this.state.showingInfoWindow) {
+        this.setState({
+          showingInfoWindow: false,
+          activeMarker: null
+        })
+      }
+    };
   render() {
     let addresses = [];
     for (let i = 0; i < 10; i++) {
@@ -160,31 +175,33 @@ class App extends Component {
           </label>
           <input type="submit" value="Send Money" />
           </form>
-          <Map google={this.props.google} zoom={14} style={style}>
-
-          <Marker onClick={this.onMarkerClick}
-                name={'Current location'} />
-          <Marker
-                title={'The marker`s title will appear as a tooltip.'}
-                name={'SOMA'}
-                position={{lat: 37.778519, lng: -122.405640}} />
-          <Marker
-                name={'Dolores park'}
-                position={{lat: 37.759703, lng: -122.428093}} />
-          <Marker />
+          <Map google={this.props.google} zoom={14} style={style} className={'map'}>
+            <Marker onClick={this.onMarkerClick}
+                  name={'Current location'} />
+            <Marker
+                  onClick={this.onMarkerClick}
+                  title={'The marker\'s title will appear as a tooltip.'}
+                  name={'SOMA'}
+                  position={{lat: 37.778519, lng: -122.405640}} 
+                  icon={{
+                    url: "bitcoin-cash-logo.png",
+                  }}/>
+                  
+            <Marker
+                  onClick={this.onMarkerClick}
+                  name={'Dolores park'}
+                  position={{lat: 37.759703, lng: -122.428093}} />
+            <InfoWindow
+            marker={this.state.activeMarker}
+            visible={this.state.showingInfoWindow}>
+              <div>
+                <h1>User1</h1>
+                <h3>pubAddress: bchtest:qz2mxw2hp67ld7q4w4tjrk5w3w9rkjqjcqzvmwd7nl</h3>
+                <button onClick={this.handleClick} >Send</button>
+              </div>
+            </InfoWindow>
           </Map>
-          <h2>BIP44 $BCH Wallet</h2>
-          <h3>256 bit english BIP39 Mnemonic:</h3> <p>{this.state.mnemonic}</p>
-          <h3>BIP44 Account</h3>
-          <p>
-            <code>"m/44'/145'/0'"</code>
-          </p>
-          <h3>BIP44 external change addresses</h3>
-          <ul>{addresses}</ul>
-          <h3>Transaction raw hex</h3>
-          <p>{this.state.hex}</p>
-          <h3>Transaction ID</h3>
-          <p>{this.state.txid}</p>
+          
         </div>
       </div>
     );
