@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import logo from "./logo.png";
+import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
 
 import "./App.css";
 // import {createWallet} from './create-wallet';
@@ -7,19 +8,6 @@ let BITBOXSDK = require("bitbox-sdk/lib/bitbox-sdk").default;
 let BITBOX = new BITBOXSDK({
   restURL: 'https://trest.bitcoin.com/v1/'
 });
-
-// let langs = [
-//   "english",
-//   "chinese_simplified",
-//   "chinese_traditional",
-//   "korean",
-//   "japanese",
-//   "french",
-//   "italian",
-//   "spanish"
-// ];
-
-// let lang = langs[Math.floor(Math.random() * langs.length)];
 
 // create 256 bit BIP39 mnemonic
 // let mnemonic = ''let mnemonic = BITBOX.Mnemonic.generate(256, BITBOX.Mnemonic.wordLists()[lang]);
@@ -39,6 +27,11 @@ let change = BITBOX.HDNode.derivePath(account, "0/0");
 
 // get the cash address
 let cashAddress = BITBOX.HDNode.toCashAddress(change);
+
+const style = {
+  width: '90%',
+  height: '90%'
+}
 
 class App extends Component {
   constructor(props) {
@@ -132,6 +125,15 @@ class App extends Component {
     );
   }
 
+  handleChange(event) {
+    this.setState({value: event.target.value});
+  }
+
+  handleSubmit(event) {
+    alert('A transaction happened: ' + this.state.value);
+    event.preventDefault();
+  }
+
   render() {
     let addresses = [];
     for (let i = 0; i < 10; i++) {
@@ -150,7 +152,27 @@ class App extends Component {
           <h1 className="App-title">Nearby Cash</h1>
         </header>
         <div className="App-content">
-          <button onClick={this.handleClick} >SEND</button>
+          {/* <button onClick={this.handleClick} >SEND</button> */}
+          <form onSubmit={this.handleSubmit}>
+          <label>
+            BCH Public Address:
+            <input type="text" value={this.state.value} onChange={this.handleChange} />
+          </label>
+          <input type="submit" value="Send Money" />
+          </form>
+          <Map google={this.props.google} zoom={14} style={style}>
+
+          <Marker onClick={this.onMarkerClick}
+                name={'Current location'} />
+          <Marker
+                title={'The marker`s title will appear as a tooltip.'}
+                name={'SOMA'}
+                position={{lat: 37.778519, lng: -122.405640}} />
+          <Marker
+                name={'Dolores park'}
+                position={{lat: 37.759703, lng: -122.428093}} />
+          <Marker />
+          </Map>
           <h2>BIP44 $BCH Wallet</h2>
           <h3>256 bit english BIP39 Mnemonic:</h3> <p>{this.state.mnemonic}</p>
           <h3>BIP44 Account</h3>
@@ -169,4 +191,6 @@ class App extends Component {
   }
 }
 
-export default App;
+export default GoogleApiWrapper({
+  apiKey: ("AIzaSyBNYY6EH0wy4-HihsEPdGE2d7PBxOYSsu4")
+})(App)

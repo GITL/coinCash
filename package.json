@@ -6,6 +6,7 @@
   "version": "2.0.0",
   "private": true,
   "dependencies": {
+    "google-maps-react": "^2.0.2",
     "node-sass": "^4.9.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",

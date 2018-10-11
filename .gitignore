@@ -24,3 +24,4 @@ yarn-error.log*
 node_modules
 bitbox-javascript-sdk
 *.DS_Store
+package-lock.json
